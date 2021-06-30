@@ -42,5 +42,8 @@ int main() {
     for (auto itor = pVec->begin(); itor != pVec->end(); itor++) {
         MyPrint(*itor);
     }
+    cout << "======Clear() test start======" << endl;
+    ccoll.Clear();
+    cout << "coll size is " << ccoll.Data()->size() << endl;
     return 0;
 }

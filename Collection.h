@@ -9,21 +9,17 @@
 BEGIN_SYNSENSE_NAMESPACE
 
 template <typename T>
-class Collection
-{
+class Collection {
 public:
    
-    Collection()
-    {
+    Collection() {
         _collection = new std::vector<T>;
     }
     
-    Collection(const Collection &c) : Collection()
-    {
+    Collection(const Collection &c) : Collection() {
         *_collection = *c._collection;
     }
-    Collection(Collection &&c) : _collection(c._collection)
-    {
+    Collection(Collection &&c) : _collection(c._collection) {
         c._collection = nullptr;
     }
 
@@ -58,6 +54,11 @@ public:
 
     Collection &Sort(std::function<bool(const T&, const T&)> compareFunc) {
         std::sort(_collection->begin(), _collection->end(), compareFunc);
+        return *this;
+    }
+
+    Collection &Clear() {
+        _collection->clear();
         return *this;
     }
     std::vector<T> *Data() {
