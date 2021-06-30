@@ -19,7 +19,7 @@ int main() {
     vector<Event> vec = {{0, 0}, {1, 1}, {1, 1}, {9, 9}, {2, 2}};
     coll.Add(vec);
     coll.Transform(MyPrint)
-        .Remove([](const Event &e) { 
+        .Filter([](const Event &e) { 
                 if (e.id == 1) 
                     return false; 
                 else 

@@ -47,7 +47,7 @@ public:
 
     //if filterFunc return false value will remove from the collections
     //otherwise value will remain in the collections
-    Collection &Remove(std::function<bool(const T& value)> filterFunc) {
+    Collection &Filter(std::function<bool(const T& value)> filterFunc) {
         for (auto itor = _collection->begin(); itor != _collection->end();) {
             if (filterFunc(*itor) == false) {
                 itor = _collection->erase(itor);
