@@ -9,3 +9,11 @@
 #ifndef END_SYNSENSE_NAMESPACE
 #define END_SYNSENSE_NAMESPACE }
 #endif
+
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(x)    \
+    {                     \
+        if (x != nullptr) \
+            delete (x);   \
+    }
+#endif

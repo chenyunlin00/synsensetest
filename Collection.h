@@ -24,6 +24,10 @@ public:
         c._collection = nullptr;
     }
 
+    virtual ~Collection() {
+        SAFE_DELETE(_collection)
+    }
+
     Collection &Transform(std::function<void(T &)> transformFunc) {
         for (auto itor = _collection->begin(); itor != _collection->end(); itor++) {
             transformFunc(*itor);
@@ -68,8 +72,8 @@ public:
     std::vector<T> *Data() {
         return _collection;
     }
-    
-private:
+
+protected:
     std::vector<T> *_collection;
 };
 
