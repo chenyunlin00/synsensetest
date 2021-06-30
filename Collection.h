@@ -19,6 +19,7 @@ public:
     Collection(const Collection &c) : Collection() {
         *_collection = *c._collection;
     }
+    
     Collection(Collection &&c) : _collection(c._collection) {
         c._collection = nullptr;
     }
@@ -29,10 +30,12 @@ public:
         }
         return *this;
     }
-    Collection &Add(const std::vector<T> vec) {
+
+    Collection &Add(const std::vector<T> &vec) {
         _collection->insert(_collection->end(), vec.begin(), vec.end());
         return *this;
     }
+
     Collection &Add(const T &value) {
         _collection->push_back(value);
         return *this;
@@ -61,11 +64,11 @@ public:
         _collection->clear();
         return *this;
     }
+
     std::vector<T> *Data() {
         return _collection;
     }
     
-
 private:
     std::vector<T> *_collection;
 };
