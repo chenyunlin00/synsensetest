@@ -76,9 +76,14 @@ public:
     }
 
     void Stop() {
+        if (_isStop == true) {
+            return;
+        }
         _isStop = true;
         _queueCV.notify_all();
-        _loopThread->join();
+        if (_loopThread != nullptr) {
+            _loopThread->join();
+        }
     }
 
     void AddNextProcessor(DataProcessor *processor) {
