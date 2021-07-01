@@ -10,3 +10,4 @@ add_library(synsensecollection SHARED ${DIR_SRCS})
 
 add_executable(test main.cpp)
 target_link_libraries(test ${PROJECT_NAME})
+target_link_libraries(test pthread)

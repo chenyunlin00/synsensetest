@@ -88,7 +88,7 @@ public:
 
 protected:
     void Loop() {
-        std::cout << "enter loop" << std::endl;
+        //std::cout << "enter loop" << std::endl;
         while (_isStop == false) {
             std::unique_lock<std::mutex> lock(_queueLock); 
             while (_isQueueEmpty == true && _isStop == false) { // 避免虚假唤醒
@@ -121,7 +121,7 @@ protected:
                 }
             }
         }
-        std::cout << "exit loop" << std::endl;
+        //std::cout << "exit loop" << std::endl;
     }
 
 protected:
