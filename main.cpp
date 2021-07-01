@@ -8,7 +8,7 @@
 using namespace synsense;
 using namespace std;
 
-#define PROCESSOR_NUM 10000
+#define PROCESSOR_NUM 1000
 
 long long g_testStartTime = 0;
 
@@ -90,14 +90,15 @@ void test1() {
 }
 
 void test2() {
+    cout << "======test2 start======" << endl;
     DataProcessor<Event> *processors = new DataProcessor<Event>[PROCESSOR_NUM];
-    for (int i=0; i<PROCESSOR_NUM; i++) {
-        (processors[i]).Traverse(AddOne);
-    }
-
     for (int i=0; i<PROCESSOR_NUM-1; i++) {
         (processors[i]).AddNextProcessor(&(processors[i+1]));
     }
+    for (int i=0; i<PROCESSOR_NUM; i++) {
+        (processors[i]).Traverse(AddOne).Run();
+    }
+
     processors[PROCESSOR_NUM-1].Traverse(CalculateDuration);
 
     auto timeNow = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch());
