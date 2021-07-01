@@ -102,7 +102,7 @@ protected:
             if (_isStop) {
                 break;
             }
-            std::vector<std::vector<T>> tmpQueue(move(_dataQueue));
+            std::vector<std::vector<T>> tmpQueue(std::move(_dataQueue));
             _isQueueEmpty = true;
             lock.unlock();
 
@@ -131,7 +131,7 @@ protected:
 
 protected:
     std::mutex _nextProcessorsLock;
-    std::list<DataProcessor *> _nextProcessors;
+    std::vector<DataProcessor *> _nextProcessors;
 
     std::mutex _processStepsLock;
     std::list<ProcessStep<T> *> _processSteps;
