@@ -114,7 +114,7 @@ protected:
             std::unique_lock<std::mutex> notifyLock(_nextProcessorsLock); 
             bool isOnlyOneNextP = false;
             if (!_nextProcessors.empty() 
-                    && _nextProcessors.begin()++ ==_nextProcessors.end()) {
+                    && _nextProcessors.begin()+1 ==_nextProcessors.end()) {
                         isOnlyOneNextP = true;
                     }
             for (auto &vec: tmpQueue) {
