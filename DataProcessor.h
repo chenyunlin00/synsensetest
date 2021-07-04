@@ -15,7 +15,7 @@
 
 BEGIN_SYNSENSE_NAMESPACE
 
-template<typename T>
+template<typename T, typename Container=std::vector<T>>
 class DataProcessor {
 public:
     DataProcessor() {
@@ -23,6 +23,9 @@ public:
         _isStop = false;  
         _loopThread = nullptr;     
     }
+
+    DataProcessor(const DataProcessor &processor) = delete;
+    DataProcessor & operator=(const DataProcessor &processor) = delete;
 
     virtual ~DataProcessor() {
         SAFE_DELETE(_loopThread)
@@ -33,36 +36,36 @@ public:
         _processSteps.clear();
     }
 
-    void AddData(const std::vector<T> &vec) {
+    void AddData(const Container &vec) {
         std::unique_lock<std::mutex> lock(_queueLock);
         _dataQueue.push_back(vec);
         _isQueueEmpty = false;
         _queueCV.notify_one();
     }
-    void AddData(std::vector<T> &&vec) {
+    void AddData(Container &&vec) {
         std::unique_lock<std::mutex> lock(_queueLock);
         _dataQueue.push_back(vec);
         _isQueueEmpty = false;
         _queueCV.notify_one();
     }
 
-    DataProcessor &Traverse(std::function<void (std::vector<T> &)> traverseFunc) {
+    DataProcessor &Traverse(std::function<void (Container &)> traverseFunc) {
         std::unique_lock<std::mutex> locker(_processStepsLock);
-        ProcessStep<T> *step = new TraverseStep<T>(traverseFunc);
+        ProcessStep<T, Container> *step = new TraverseStep<T, Container>(traverseFunc);
         _processSteps.push_back(step);
         return *this;
     }
 
     DataProcessor &Filter(std::function<bool (const T&)> filterFunc) {
         std::unique_lock<std::mutex> locker(_processStepsLock);
-        ProcessStep<T> *step = new FilterStep<T>(filterFunc);
+        ProcessStep<T, Container> *step = new FilterStep<T, Container>(filterFunc);
         _processSteps.push_back(step);
         return *this;
     }
 
     DataProcessor &Sort(std::function<bool (const T&, const T&)> sortFunc) {
         std::unique_lock<std::mutex> locker(_processStepsLock);
-        ProcessStep<T> *step = new SortStep<T>(sortFunc);
+        ProcessStep<T, Container> *step = new SortStep<T, Container>(sortFunc);
         _processSteps.push_back(step);
         return *this;
     }
@@ -102,13 +105,18 @@ protected:
             if (_isStop) {
                 break;
             }
-            std::vector<std::vector<T>> tmpQueue(std::move(_dataQueue));
+            std::vector<Container> tmpQueue(std::move(_dataQueue));
             _isQueueEmpty = true;
             lock.unlock();
 
             
             std::unique_lock<std::mutex> stepLock(_processStepsLock); 
             std::unique_lock<std::mutex> notifyLock(_nextProcessorsLock); 
+            bool isOnlyOneNextP = false;
+            if (!_nextProcessors.empty() 
+                    && _nextProcessors.begin()++ ==_nextProcessors.end()) {
+                        isOnlyOneNextP = true;
+                    }
             for (auto &vec: tmpQueue) {
                 //run process chain
                 for (auto &itor: _processSteps) {
@@ -116,7 +124,7 @@ protected:
                 }
 
                 //notify next processors
-                if (_nextProcessors.size() == 1) {
+                if (isOnlyOneNextP) {
                     DataProcessor *next = _nextProcessors.front();
                     next->AddData(std::move(vec));
                 } else {
@@ -134,12 +142,12 @@ protected:
     std::vector<DataProcessor *> _nextProcessors;
 
     std::mutex _processStepsLock;
-    std::list<ProcessStep<T> *> _processSteps;
+    std::list<ProcessStep<T, Container> *> _processSteps;
 
     std::mutex _queueLock;
     std::condition_variable _queueCV;
     bool _isQueueEmpty;
-    std::vector<std::vector<T>> _dataQueue;
+    std::vector<Container> _dataQueue;
 
     bool _isStop;
     std::thread *_loopThread;
