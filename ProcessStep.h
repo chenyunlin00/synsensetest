@@ -20,9 +20,8 @@ class TraverseStep : public ProcessStep<T, Container> {
     typedef std::function<void (Container &)> CallbackFunc;
 public:
     TraverseStep() = delete;
-    TraverseStep(CallbackFunc callback) : _callback(callback) {
-
-    }
+    TraverseStep(CallbackFunc callback) : _callback(callback) {}
+    
     virtual void execute(Container &vec) {
         _callback(vec);
     }
@@ -36,9 +35,8 @@ class FilterStep : public ProcessStep<T, Container> {
     typedef std::function<bool (const T&)> CallbackFunc;
 public:
     FilterStep() = delete;
-    FilterStep(CallbackFunc callback) : _callback(callback) {
+    FilterStep(CallbackFunc callback) : _callback(callback) {}
 
-    }
     virtual void execute(Container &vec) {
         for (auto itor = vec.begin(); itor != vec.end();) {
             if (_callback(*itor) == false) {
@@ -59,25 +57,22 @@ class SortStep : public ProcessStep<T, Container> {
     typedef std::function<bool (const T&, const T&)> CallbackFunc;
 public:
     SortStep() = delete;
-    SortStep(CallbackFunc callback) : _callback(callback) {
-        if (std::is_same_v<Container, std::vector<typename Container::value_type>>) {
-            _isList = false;
-        } else {
-            _isList = true;
-        }
-    }
+    SortStep(CallbackFunc callback) : _callback(callback) {}
+
     virtual void execute(Container &vec) {
-        /**
-        if (_isList == false) {
-            std::sort(vec.begin(), vec.end(), _callback);
-        } else {
-            vec.sort(_callback);
-        }**/
-        std::sort(vec.begin(), vec.end(), _callback);
+        SortInner(vec);
     }
 
 protected:
-    bool _isList;
+    void SortInner(std::vector<T> &vec) {
+        std::sort(vec.begin(), vec.end(), _callback);
+    }
+
+    void SortInner(std::list<T> &list) {
+        list.sort(_callback);
+    }
+
+protected:
     CallbackFunc _callback;
 };
 

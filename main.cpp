@@ -170,7 +170,7 @@ void testFilterPerf(const char *name) {
 
 int main(int argc, char **argv) {
     testBasicFunction<Event, vector<Event>>();
-    //testBasicFunction<Event, list<Event>>();
+    testBasicFunction<Event, list<Event>>();
     testTraversePerf<Event, vector<Event>>("vector");
     testTraversePerf<Event, list<Event>>("list");
     testFilterPerf<Event, vector<Event>>("vector");
