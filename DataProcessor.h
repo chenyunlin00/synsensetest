@@ -38,13 +38,14 @@ public:
 
     void AddData(const Container &vec) {
         std::unique_lock<std::mutex> lock(_queueLock);
-        _dataQueue.push_back(vec);
+        _dataQueue.emplace_back(vec);
         _isQueueEmpty = false;
         _queueCV.notify_one();
     }
+
     void AddData(Container &&vec) {
         std::unique_lock<std::mutex> lock(_queueLock);
-        _dataQueue.push_back(vec);
+        _dataQueue.emplace_back(std::forward<Container>(vec));
         _isQueueEmpty = false;
         _queueCV.notify_one();
     }
@@ -117,7 +118,7 @@ protected:
                     && _nextProcessors.begin()+1 ==_nextProcessors.end()) {
                         isOnlyOneNextP = true;
                     }
-            for (auto &vec: tmpQueue) {
+            for (auto &&vec: tmpQueue) {
                 //run process chain
                 for (auto &itor: _processSteps) {
                     (itor)->execute(vec);

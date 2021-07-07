@@ -138,7 +138,8 @@ void testFilterPerf(const char *name) {
     int ratio = TESTDATA_NUM/PROCESSOR_NUM;
     for (int i=0; i<PROCESSOR_NUM; i++) {
         (processors[i]).Filter([=](const T &e) {
-            if (e.id >= i*ratio && e.id < (i+1)*ratio) {
+            //if (e.id >= ((i+1)*ratio)%TESTDATA_NUM && e.id < ((i+2)*ratio)%TESTDATA_NUM) {
+            if (e.id >= ((i)*ratio)%TESTDATA_NUM && e.id < ((i+1)*ratio)%TESTDATA_NUM) {    
                 return false;
             } else {
                 return true;
